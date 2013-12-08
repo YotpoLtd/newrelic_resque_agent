@@ -36,10 +36,12 @@ module NewRelicResqueAgent
         info = Resque.info
         
         report_metric "Workers/Working", "Workers",           info[:working]
-        report_metric "MinWorkersAlert", "MinWorkersAlert",             info[:workers] < 10 ? 1: 0
+        report_metric "Workers/Total", "Workers",             info[:workers]
+        report_metric "MinWorkersCritical", "MinWorkersCritical",   info[:workers] < 10 ? 1: 0
+        report_metric "MinWorkersWarning", "MinWorkersWarning",   info[:workers] < 50 ? 1: 0
         report_metric "Jobs/Pending", "Jobs",                 info[:pending]
-        report_metric "Jobs/Rate/Processed", "Jobs/Second",        @processed.process(info[:processed])
-        report_metric "Jobs/Rate/Failed", "Jobs/Second",           @total_failed.process(info[:failed])
+        report_metric "Jobs/Rate/Processed", "Jobs/Second",   @processed.process(info[:processed])
+        report_metric "Jobs/Rate/Failed", "Jobs/Second",      @total_failed.process(info[:failed])
         report_metric "Queues", "Queues",                     info[:queues]
         report_metric "Jobs/Failed", "Jobs",                  info[:failed] || 0
         
