@@ -1,0 +1,27 @@
+#
+#
+# This is a sample newrelic_plugin.yml file
+#
+# Please make sure to update the license_key information with the license key for your New Relic
+# account.
+#
+#
+newrelic:
+  #
+  # Update with your New Relic account license key:
+  #
+  license_key: '88f03ed234f4b874ad12ed8f25f4ebb7ada57240'
+  #
+  # Set to '1' for verbose output, remove for normal output.
+  # All output goes to stdout/stderr.
+  #
+  verbose: 0
+#
+# Agent Configuration:
+#
+agents:
+  dev_resque:
+    # Redis connection string: 'hostname:port' or 'hostname:port:db' or 'redis://user:password@hostname:port:db'
+    redis: localhost:6379:1
+    # Resque namespace
+    namespace:
