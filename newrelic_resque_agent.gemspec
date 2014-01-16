@@ -52,6 +52,7 @@ This is the New Relic plugin for monitoring Resque developed by Railsware Inc.
   s.add_dependency('newrelic_plugin', "1.0.3")
   s.add_dependency('resque', ">= 1.24.1")
   s.add_dependency('redis', ">= 3.0.4")
+  s.add_dependency('ridley')
 
 
   s.post_install_message = <<-EOF

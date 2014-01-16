@@ -6,6 +6,7 @@
 # account.
 #
 #
+
 newrelic:
   #
   # Update with your New Relic account license key:
@@ -16,12 +17,15 @@ newrelic:
   # All output goes to stdout/stderr.
   #
   verbose: 0
-#
-# Agent Configuration:
-#
-agents:
-  dev_resque:
-    # Redis connection string: 'hostname:port' or 'hostname:port:db' or 'redis://user:password@hostname:port:db'
-    redis: localhost:6379:1
-    # Resque namespace
-    namespace:
+
+
+
+chef:
+    #server url.
+    server_url: "https://api.opscode.com/organizations/organization"
+    #user name.
+    client_name: "user"
+    #path to key file.
+    client_key: "/Users/user/.chef/user.pem"
+    #the environment for search.
+    environment: production

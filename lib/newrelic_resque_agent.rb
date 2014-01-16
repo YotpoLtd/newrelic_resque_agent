@@ -7,9 +7,11 @@ require "newrelic_plugin"
 require 'resque'
 require 'redis'
 
+require 'ridley'
+
 module NewRelicResqueAgent
   
-  VERSION = '1.0.1'
+  VERSION = '1.0.2'
 
   class Agent < NewRelic::Plugin::Agent::Base
 
@@ -44,15 +46,15 @@ module NewRelicResqueAgent
         report_metric "Jobs/Rate/Failed", "Jobs/Second",      @total_failed.process(info[:failed])
         report_metric "Queues", "Queues",                     info[:queues]
         report_metric "Jobs/Failed", "Jobs",                  info[:failed] || 0
-        
+        report_metric 'Redis/Alive', 'Boolean',               1
         
 
       rescue Redis::TimeoutError
-        raise 'Redis server timeout'
+        report_metric 'Redis/Alive', 'Boolean',               0
       rescue  Redis::CannotConnectError, Redis::ConnectionError
-        raise 'Could not connect to redis'
+        report_metric 'Redis/Alive', 'Boolean',               0
       rescue Errno::ECONNRESET
-        raise 'Connection was reset by peer'
+        report_metric 'Redis/Alive', 'Boolean',               0
       end
     end
 
@@ -60,6 +62,23 @@ module NewRelicResqueAgent
   
   # Register and run the agent
   def self.run
+    config = NewRelic::Plugin::Config.config.options
+    environment = config['chef']['environment'] || 'production'
+    ridley = ::Ridley.new(
+        server_url: config['chef']['server_url'],
+        client_name: config['chef']['client_name'],
+        client_key: config['chef']['client_key']
+    )
+    servers = ridley.search(:node, "environment:#{environment} AND role:yotpo_redis")
+    agents = {}
+    servers.each do |node|
+      ip = node.automatic_attributes.ipaddress
+      agents[ip] = {'redis' => "#{ip}:6379"}
+    end
+
+    config['agents'] = agents
+    NewRelic::Plugin::Config.config_yaml = YAML::dump(config)
+
     NewRelic::Plugin::Config.config.agents.keys.each do |agent|
       NewRelic::Plugin::Setup.install_agent agent, NewRelicResqueAgent
     end

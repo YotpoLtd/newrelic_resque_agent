@@ -8,7 +8,7 @@ The New Relic Resque Plugin enables monitoring of Resque, a library for processi
 * Queues number
 * Number of workers
 * Number of processed jobs
-
+* Was the connection to the instance was succesful
 ### Requirements
 
 The Resque monitoring Plugin for New Relic requires the following:
@@ -30,7 +30,7 @@ The Resque monitoring Plugin for New Relic requires the following:
  
     3.1. replace `YOUR_LICENSE_KEY_HERE` with your New Relic license key. Your license key can be found under Account Settings at https://rpm.newrelic.com, see https://newrelic.com/docs/subscriptions/license-key for more help.
 
-    3.2. add the Redis connection string: 'hostname:port' or 'hostname:port:db' or 'redis://user:password@hostname:port:db'
+    3.2. Add the chef server_url, client_name, client_key and environment(production, staging etc.).
 
 4. Execute
 

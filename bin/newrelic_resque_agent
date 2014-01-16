@@ -42,6 +42,11 @@ if args.first == "run"
     puts "Run 'sudo newrelic_resque_agent install' for setup config"
     exit 1
   end
+  config_hash = NewRelic::Plugin::Config.config.options
+  if config_hash['chef'] == nil || config_hash['chef'].empty?
+    puts 'No chef definition in config file!'
+  end
+
   NewRelicResqueAgent.run
 elsif args.first == "install"
   config_file = File.read(File.expand_path("../../config/newrelic_plugin.yml.example", __FILE__))
