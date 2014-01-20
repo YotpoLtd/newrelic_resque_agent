@@ -62,21 +62,9 @@ module NewRelicResqueAgent
   
   # Register and run the agent
   def self.run
-    config = NewRelic::Plugin::Config.config.options
-    environment = config['chef']['environment'] || 'production'
-    ridley = ::Ridley.new(
-        server_url: config['chef']['server_url'],
-        client_name: config['chef']['client_name'],
-        client_key: config['chef']['client_key']
-    )
-    servers = ridley.search(:node, "environment:#{environment} AND role:yotpo_redis")
-    agents = {}
-    servers.each do |node|
-      ip = node.automatic_attributes.ipaddress
-      agents[ip] = {'redis' => "#{ip}:6379"}
-    end
 
-    config['agents'] = agents
+    config = NewRelic::Plugin::Config.config.options
+    config['agents'] = get_agents(config['chef']['server_url'], config['chef']['client_name'], config['chef']['client_key'], config['chef']['environment'] || 'production')
     NewRelic::Plugin::Config.config_yaml = YAML::dump(config)
 
     NewRelic::Plugin::Config.config.agents.keys.each do |agent|
@@ -87,6 +75,21 @@ module NewRelicResqueAgent
     # Launch the agent (never returns)
     #
     NewRelic::Plugin::Run.setup_and_run
+  end
+
+  def self.get_agents(server_url, client_name, client_key, environment = 'production')
+    ridley = ::Ridley.new(
+        server_url: server_url,
+        client_name: client_name,
+        client_key: client_key
+    )
+    servers = ridley.search(:node, "environment:#{environment} AND role:yotpo_redis")
+    agents = {}
+    servers.each do |node|
+      ip = node.automatic_attributes.ipaddress
+      agents[ip] = {'redis' => "#{ip}:6379"}
+    end
+    return agents
   end
 
 end
