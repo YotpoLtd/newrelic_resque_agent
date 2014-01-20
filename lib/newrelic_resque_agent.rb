@@ -86,10 +86,16 @@ module NewRelicResqueAgent
     servers = ridley.search(:node, "environment:#{environment} AND role:yotpo_redis")
     agents = {}
     servers.each do |node|
-      ip = node.automatic_attributes.ipaddress
-      agents[ip] = {'redis' => "#{ip}:6379"}
+      port = 6379
+      unless node.chef_attributes.yotpo_server.redis_master
+        port += 1
+      end
+      node.chef_attributes.yotpo_server['yotpo-redis'].instances.times do
+        ip = node.automatic_attributes.fqdn
+        agents["#{ip}_#{port}"] = {'redis' => "#{ip}:#{port}"}
+        port += 1
+      end
     end
     return agents
   end
-
 end
